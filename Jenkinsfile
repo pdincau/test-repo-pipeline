@@ -1,11 +1,12 @@
 node {
+  env.PROJECT_NAME="testrepo"
+
   stage('Preparation') {
       dir('git-repo') {
-        checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: 'https://github.com/pdincau/testrepo.git']]])
+        checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: "https://github.com/pdincau/${env.PROJECT_NAME}.git"]]])
 
-        def completeName = sh(script: 'git name-rev --name-only HEAD', returnStdout: true)
-        def matcher = completeName =~ /remotes\/origin\/(.+)/;
-        env.BRANCH_NAME = matcher[0][1];
+        env.BRANCH_NAME = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true)
+        echo env.BRANCH_NAME
      }
    }
    stage('sync'){
@@ -16,8 +17,6 @@ node {
       RTC_PASSWORD="valentina"
       REMOTE_WORKSPACE="sync-workspace$BUILD_NUMBER"
       LOCAL_WORKSPACE="local-sync-workspace"
-
-      PROJECT_NAME="testrepo"
 
       /opt/scmtools/eclipse/scm login -u $RTC_USERNAME -P $RTC_PASSWORD -r $RTC_URL
       /opt/scmtools/eclipse/scm create workspace -r $RTC_URL -s $DESTINATION_STREAM $REMOTE_WORKSPACE
