@@ -2,6 +2,14 @@ node {
   stage('Preparation') {
       dir('git-repo') {
         git 'https://github.com/pdincau/testrepo'
+
+        sh 'git rev-parse --abbrev-ref HEAD > GIT_BRANCH'
+        git_branch = readFile('GIT_BRANCH').trim()
+        echo git_branch
+
+        sh 'git rev-parse HEAD > GIT_COMMIT'
+        git_commit = readFile('GIT_COMMIT').trim()
+        echo git_commit
      }
    }
    stage('sync'){
