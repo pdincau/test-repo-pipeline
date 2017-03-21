@@ -3,10 +3,10 @@ node {
       dir('git-repo') {
         checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: 'https://github.com/pdincau/testrepo.git']]])
 
-        env.BRANCH_NAME = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true)
+        env.BRANCH_NAME = sh(script: 'git name-rev --name-only HEAD', returnStdout: true)
         echo env.BRANCH_NAME
 
-        sh 'git rev-parse --abbrev-ref HEAD > GIT_BRANCH'
+        sh 'git name-rev --name-only HEAD > GIT_BRANCH'
         git_branch = readFile('GIT_BRANCH').trim()
         echo git_branch
      }
