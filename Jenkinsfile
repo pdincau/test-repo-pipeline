@@ -22,17 +22,21 @@ node {
         /opt/scmtools/eclipse/scm create workspace -r $RTC_URL -s $BRANCH_NAME $REMOTE_WORKSPACE
       '''
 
-      sh '''
-        /opt/scmtools/eclipse/scm load -r $RTC_URL -f -d $LOCAL_WORKSPACE --all $REMOTE_WORKSPACE
+      try {
+        sh '''
+          /opt/scmtools/eclipse/scm load -r $RTC_URL -f -d $LOCAL_WORKSPACE --all $REMOTE_WORKSPACE
 
-        rsync -av --progress git-repo/* $LOCAL_WORKSPACE/SRC/$PROJECT_NAME --exclude .git --delete
+          rsync -av --progress git-repo/* $LOCAL_WORKSPACE/SRC/$PROJECT_NAME --exclude .git --delete
 
-        /opt/scmtools/eclipse/scm checkin --comment "synch commit" $LOCAL_WORKSPACE
-        /opt/scmtools/eclipse/scm deliver -d $LOCAL_WORKSPACE --source $REMOTE_WORKSPACE -r $RTC_URL
-      '''
-
-      sh '''
-        /opt/scmtools/eclipse/scm delete workspace -r $RTC_URL $REMOTE_WORKSPACE
-      '''
+          /opt/scmtools/eclipse/scm checkin --comment "synch commit" $LOCAL_WORKSPACE
+          /opt/scmtools/eclipse/scm deliver -d $LOCAL_WORKSPACE --source $REMOTE_WORKSPACE -r $RTC_URL
+        '''
+      } catch(exception) {
+        throw exception
+      } finally {
+        sh '''
+          /opt/scmtools/eclipse/scm delete workspace -r $RTC_URL $REMOTE_WORKSPACE
+        '''
+      }
    }
 }
