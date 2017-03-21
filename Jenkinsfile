@@ -1,15 +1,14 @@
 node {
   stage('Preparation') {
       dir('git-repo') {
-        git 'https://github.com/pdincau/testrepo'
+        checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: 'https://github.com/pdincau/testrepo.git']]])
+
+        env.BRANCH_NAME = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true)
+        echo env.BRANCH_NAME
 
         sh 'git rev-parse --abbrev-ref HEAD > GIT_BRANCH'
         git_branch = readFile('GIT_BRANCH').trim()
         echo git_branch
-
-        sh 'git rev-parse HEAD > GIT_COMMIT'
-        git_commit = readFile('GIT_COMMIT').trim()
-        echo git_commit
      }
    }
    stage('sync'){
