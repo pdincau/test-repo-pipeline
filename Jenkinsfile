@@ -1,6 +1,12 @@
 node {
   env.PROJECT_NAME="testrepo"
 
+  env.RTC_URL="https://10.0.0.74:9443/ccm"
+  env.RTC_USERNAME="valentina"
+  env.RTC_PASSWORD="valentina"
+  env.REMOTE_WORKSPACE="sync-workspace$BUILD_NUMBER"
+  env.LOCAL_WORKSPACE="local-sync-workspace"
+
   stage('Preparation') {
       dir('git-repo') {
         checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: "https://github.com/pdincau/${env.PROJECT_NAME}.git"]]])
@@ -12,15 +18,8 @@ node {
    }
    stage('sync'){
       sh '''
-        DESTINATION_STREAM=$BRANCH_NAME
-        RTC_URL="https://10.0.0.74:9443/ccm"
-        RTC_USERNAME="valentina"
-        RTC_PASSWORD="valentina"
-        REMOTE_WORKSPACE="sync-workspace$BUILD_NUMBER"
-        LOCAL_WORKSPACE="local-sync-workspace"
-
         /opt/scmtools/eclipse/scm login -u $RTC_USERNAME -P $RTC_PASSWORD -r $RTC_URL
-        /opt/scmtools/eclipse/scm create workspace -r $RTC_URL -s $DESTINATION_STREAM $REMOTE_WORKSPACE
+        /opt/scmtools/eclipse/scm create workspace -r $RTC_URL -s $BRANCH_NAME $REMOTE_WORKSPACE
       '''
 
       sh '''
