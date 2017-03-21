@@ -3,9 +3,9 @@ node {
       dir('git-repo') {
         checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: 'https://github.com/pdincau/testrepo.git']]])
 
-        def remote = sh(script: 'git name-rev --name-only HEAD', returnStdout: true)
-        def matcher = remote =~ /remotes\/origin\/(.+)/;
-        env.BRANCH_NAME = matcher[0][1]​
+        def completeName = sh(script: 'git name-rev --name-only HEAD', returnStdout: true)
+        def matcher = completeName =~ /remotes\/origin\/(.+)/;
+        env.BRANCH_NAME = matcher[0][1];
      }
    }
    stage('sync'){
