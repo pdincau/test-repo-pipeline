@@ -1,3 +1,5 @@
+import hudson.model.*
+
 node {
   env.PROJECT_NAME="testrepo"
 
@@ -7,6 +9,8 @@ node {
   env.REMOTE_WORKSPACE="sync-workspace$BUILD_NUMBER"
   env.LOCAL_WORKSPACE="local-sync-workspace"
 
+  def payloadString = build.buildVariableResolver.resolve("payload")
+  print payloadString
   stage('Preparation') {
       dir('git-repo') {
         checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: "https://github.com/pdincau/${env.PROJECT_NAME}.git"]]])
