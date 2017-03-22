@@ -32,7 +32,7 @@ node {
           /opt/scmtools/eclipse/scm deliver -d $LOCAL_WORKSPACE --source $REMOTE_WORKSPACE -r $RTC_URL
         '''
       } catch(exception) {
-        mail()
+        mailSyncFailed()
         throw exception
       } finally {
         sh '''
@@ -42,6 +42,8 @@ node {
    }
 }
 
-def mail() {
-  mail subject: 'test email for paolo', to: 'paolo.dincau@xpeppers.com', body: 'ciao'
+def mailSyncFailed() {
+   mail subject: "Sync to RTC failed in Jenkins: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+        to: 'paolo.dincau@xpeppers.com',
+        body: "Sync to RTC ${env.JOB_NAME} failed in Jenkins.\n\nSee ${env.BUILD_URL}"
 }
