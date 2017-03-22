@@ -13,10 +13,8 @@ node {
      }
    }
    stage('sync'){
-      sh '''
-        /opt/scmtools/eclipse/scm login -u $RTC_USERNAME -P $RTC_PASSWORD -r $RTC_URL
-        /opt/scmtools/eclipse/scm create workspace -r $RTC_URL -s $BRANCH_NAME $REMOTE_WORKSPACE
-      '''
+      scm 'login -u $RTC_USERNAME -P $RTC_PASSWORD -r $RTC_URL'
+      scm 'create workspace -r $RTC_URL -s $BRANCH_NAME $REMOTE_WORKSPACE'
 
       try {
         sh '''
@@ -36,6 +34,10 @@ node {
         '''
       }
    }
+}
+
+def scm(command) {
+  sh "/opt/scmtools/eclipse/scm $command"
 }
 
 def mailSyncFailed() {
