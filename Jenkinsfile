@@ -6,6 +6,8 @@ node {
   env.REMOTE_WORKSPACE="sync-workspace$BUILD_NUMBER"
   env.LOCAL_WORKSPACE="local-sync-workspace"
 
+  def scmtools = '/opt/scmtools/eclipse'
+
   stage('Preparation') {
       dir('git-repo') {
         checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: "https://github.com/pdincau/${env.PROJECT_NAME}.git"]]])
@@ -15,29 +17,26 @@ node {
    stage('sync'){
       scm 'login -u $RTC_USERNAME -P $RTC_PASSWORD -r $RTC_URL'
       scm 'create workspace -r $RTC_URL -s $BRANCH_NAME $REMOTE_WORKSPACE'
-
       try {
-        sh '''
-          /opt/scmtools/eclipse/scm load -r $RTC_URL -f -d $LOCAL_WORKSPACE --all $REMOTE_WORKSPACE
+          scm 'load -r $RTC_URL -f -d $LOCAL_WORKSPACE --all $REMOTE_WORKSPACE'
 
-          rsync -av --progress git-repo/* $LOCAL_WORKSPACE/SRC/$PROJECT_NAME --exclude .git --delete
+          sh 'rsync -av --progress git-repo/* $LOCAL_WORKSPACE/SRC/$PROJECT_NAME --exclude .git --delete'
 
-          /opt/scmtools/eclipse/scm checkin --comment "synch commit" $LOCAL_WORKSPACE
-          /opt/scmtools/eclipse/scm deliver -d $LOCAL_WORKSPACE --source $REMOTE_WORKSPACE -r $RTC_URL
-        '''
-      } catch(exception) {
+          scm 'checkin --comment "synch commit" $LOCAL_WORKSPACE'
+          scm 'deliver -d $LOCAL_WORKSPACE --source $REMOTE_WORKSPACE -r $RTC_URL'
+      }
+      catch(exception) {
         mailSyncFailed()
         throw exception
-      } finally {
-        sh '''
-          /opt/scmtools/eclipse/scm delete workspace -r $RTC_URL $REMOTE_WORKSPACE
-        '''
+      }
+      finally {
+        scm 'delete workspace -r $RTC_URL $REMOTE_WORKSPACE'
       }
    }
 }
 
 def scm(command) {
-  sh "/opt/scmtools/eclipse/scm $command"
+  sh "$scmtools/scm $command"
 }
 
 def mailSyncFailed() {
