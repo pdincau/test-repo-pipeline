@@ -19,7 +19,7 @@ node {
      }
      stage('RTC clone') {
         scm "login -u $rtcUsername -P $rtcPassword -r $rtcUrl"
-        scm "create workspace -r $rtcUrl -s $BRANCH_NAME $remoteWorkspace"
+        scm "create workspace -r $rtcUrl -s ${env.BRANCH_NAME} $remoteWorkspace"
         scm "load -r $rtcUrl -f -d $localWorkspace --all $remoteWorkspace"
      }
      stage('Sync Git to RTC') {
