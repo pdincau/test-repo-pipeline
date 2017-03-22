@@ -13,7 +13,7 @@ node {
   try {
     stage('Git clone') {
         dir('git-repo') {
-          checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: "https://github.com/$organization/$projectName.git"]]])
+          checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: "https://github.com/$organization/${projectName}.git"]]])
           env.BRANCH_NAME = branchName()
        }
      }
