@@ -8,7 +8,6 @@ node {
   env.LOCAL_WORKSPACE="local-sync-workspace"
 
   stage('Preparation') {
-      sh 'env'
       dir('git-repo') {
         checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: "https://github.com/pdincau/${env.PROJECT_NAME}.git"]]])
 
