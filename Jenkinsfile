@@ -1,4 +1,5 @@
 node {
+  env.PROJECT_NAME="testrepo"
   env.RTC_URL="https://10.0.0.112:9443/ccm"
   env.RTC_USERNAME="valentina"
   env.RTC_PASSWORD="valentina"
@@ -8,7 +9,6 @@ node {
   stage('Preparation') {
       dir('git-repo') {
         checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: "https://github.com/pdincau/${env.PROJECT_NAME}.git"]]])
-        env.PROJECT_NAME = projectName()
         env.BRANCH_NAME = branchName()
      }
    }
@@ -42,12 +42,6 @@ def mailSyncFailed() {
    mail subject: "Sync to RTC failed in Jenkins: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
         to: 'paolo.dincau@xpeppers.com',
         body: "Sync to RTC ${env.JOB_NAME} failed in Jenkins.\n\nSee ${env.BUILD_URL}"
-}
-
-def projectName() {
-  def repoUrl = sh(script: 'git config --get remote.origin.url', returnStdout: true)
-  def matcher = repoUrl =~ /.+\/(.+)\.git/;
-  matcher[0][1]
 }
 
 def branchName() {
