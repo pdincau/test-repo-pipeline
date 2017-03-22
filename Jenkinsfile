@@ -1,3 +1,4 @@
+def scmtools = '/opt/scmtools/eclipse'
 node {
   env.PROJECT_NAME=env.JOB_NAME
   env.RTC_URL="https://10.0.0.112:9443/ccm"
@@ -5,8 +6,6 @@ node {
   env.RTC_PASSWORD="valentina"
   env.REMOTE_WORKSPACE="sync-workspace$BUILD_NUMBER"
   env.LOCAL_WORKSPACE="local-sync-workspace"
-
-  def scmtools = '/opt/scmtools/eclipse'
 
   stage('Preparation') {
       dir('git-repo') {
