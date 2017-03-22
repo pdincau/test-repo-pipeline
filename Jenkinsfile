@@ -1,5 +1,5 @@
 node {
-  env.PROJECT_NAME="testrepo"
+  env.PROJECT_NAME=env.JOB_NAME
   env.RTC_URL="https://10.0.0.112:9443/ccm"
   env.RTC_USERNAME="valentina"
   env.RTC_PASSWORD="valentina"
