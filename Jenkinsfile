@@ -1,7 +1,7 @@
 node {
   env.PROJECT_NAME="testrepo"
 
-  env.RTC_URL="https://10.0.0.74:9443/ccm"
+  env.RTC_URL="https://10.0.0.112:9443/ccm"
   env.RTC_USERNAME="valentina"
   env.RTC_PASSWORD="valentina"
   env.REMOTE_WORKSPACE="sync-workspace$BUILD_NUMBER"
