@@ -32,7 +32,7 @@ node {
           /opt/scmtools/eclipse/scm deliver -d $LOCAL_WORKSPACE --source $REMOTE_WORKSPACE -r $RTC_URL
         '''
       } catch(exception) {
-        mail
+        mail()
         throw exception
       } finally {
         sh '''
