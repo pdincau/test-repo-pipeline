@@ -1,9 +1,8 @@
 node {
-  def fullName = 'pdincau/testrepo'.tokenize( '/' )
-  def organization = fullName[0]
-  def projectName = fullName[1]
-  //def organization = 'pdincau'
-  //def projectName = 'testrepo'
+  def projectPath = env.JOB_NAME.tokenize( '/' )
+  def organization = projectPath[0]
+  def projectName = projectPath[1]
+
   env.RTC_URL="https://10.0.0.112:9443/ccm"
   env.RTC_USERNAME="valentina"
   env.RTC_PASSWORD="valentina"
