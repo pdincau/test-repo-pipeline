@@ -20,7 +20,7 @@ node {
         scm 'load -r $RTC_URL -f -d $LOCAL_WORKSPACE --all $REMOTE_WORKSPACE'
      }
      stage('Sync Git to RTC') {
-        sync '$GIT_CLONE_DIRECTORY', "\$LOCAL_WORKSPACE/SRC/$projectName"
+        sync '$GIT_CLONE_DIRECTORY', "${env.LOCAL_WORKSPACE}/SRC/$projectName"
         scm 'checkin --comment "synch commit" $LOCAL_WORKSPACE'
         scm 'deliver -d $LOCAL_WORKSPACE --source $REMOTE_WORKSPACE -r $RTC_URL'
     }
