@@ -5,6 +5,7 @@ node {
   env.RTC_PASSWORD="valentina"
   env.REMOTE_WORKSPACE="sync-workspace$BUILD_NUMBER"
   env.LOCAL_WORKSPACE="local-sync-workspace"
+  env.GIT_CLONE_DIRECTORY="git-repo"
 
   try {
     stage('Git clone') {
@@ -19,7 +20,7 @@ node {
         scm 'load -r $RTC_URL -f -d $LOCAL_WORKSPACE --all $REMOTE_WORKSPACE'
      }
      stage('Sync Git to RTC') {
-        sync 'git-repo', '$LOCAL_WORKSPACE/SRC/$PROJECT_NAME'
+        sync '$GIT_CLONE_DIRECTORY', '$LOCAL_WORKSPACE/SRC/$PROJECT_NAME'
         scm 'checkin --comment "synch commit" $LOCAL_WORKSPACE'
         scm 'deliver -d $LOCAL_WORKSPACE --source $REMOTE_WORKSPACE -r $RTC_URL'
     }
