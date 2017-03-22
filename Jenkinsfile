@@ -3,29 +3,29 @@ node {
   def organization = projectPath[0]
   def projectName = projectPath[1]
 
-  env.RTC_URL="https://10.0.0.112:9443/ccm"
-  env.RTC_USERNAME="valentina"
-  env.RTC_PASSWORD="valentina"
-  env.REMOTE_WORKSPACE="sync-workspace$BUILD_NUMBER"
-  env.LOCAL_WORKSPACE="local-sync-workspace"
-  env.GIT_CLONE_DIRECTORY="git-repo"
+  def rtcUrl='https://10.0.0.112:9443/ccm'
+  def rtcUsername='valentina'
+  def rtcPassword='valentina'
+  def remoteWorkspace="sync-workspace${env.BUILD_NUMBER}"
+  def localWorkspace='local-sync-workspace'
+  def gitCloneDirectory='git-repo'
 
   try {
     stage('Git clone') {
         dir('git-repo') {
-          checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: "https://github.com/${organization}/${projectName}.git"]]])
+          checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: "https://github.com/$organization/$projectName.git"]]])
           env.BRANCH_NAME = branchName()
        }
      }
      stage('RTC clone') {
-        scm 'login -u $RTC_USERNAME -P $RTC_PASSWORD -r $RTC_URL'
-        scm 'create workspace -r $RTC_URL -s $BRANCH_NAME $REMOTE_WORKSPACE'
-        scm 'load -r $RTC_URL -f -d $LOCAL_WORKSPACE --all $REMOTE_WORKSPACE'
+        scm "login -u $rtcUsername -P $rtcPassword -r $rtcUrl"
+        scm "create workspace -r $rtcUrl -s $BRANCH_NAME $remoteWorkspace"
+        scm "load -r $rtcUrl -f -d $localWorkspace --all $remoteWorkspace"
      }
      stage('Sync Git to RTC') {
-        sync '$GIT_CLONE_DIRECTORY', "${env.LOCAL_WORKSPACE}/SRC/$projectName"
-        scm 'checkin --comment "synch commit" $LOCAL_WORKSPACE'
-        scm 'deliver -d $LOCAL_WORKSPACE --source $REMOTE_WORKSPACE -r $RTC_URL'
+        sync gitCloneDirectory, "$localWorkspace/SRC/$projectName"
+        scm "checkin --comment "synch commit" $localWorkspace"
+        scm "deliver -d $localWorkspace --source $remoteWorkspace -r $rtcUrl"
     }
   }
   catch(exception) {
@@ -33,7 +33,7 @@ node {
     throw exception
   }
   finally {
-    scm 'delete workspace -r $RTC_URL $REMOTE_WORKSPACE'
+    scm "delete workspace -r $rtcUrl $remoteWorkspace"
   }
 }
 
