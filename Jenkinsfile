@@ -1,5 +1,5 @@
 node {
-  env.PROJECT_NAME=env.JOB_NAME
+  def (organization, projectName) = env.JOB_NAME.tokenize( '/' )
   env.RTC_URL="https://10.0.0.112:9443/ccm"
   env.RTC_USERNAME="valentina"
   env.RTC_PASSWORD="valentina"
@@ -10,7 +10,7 @@ node {
   try {
     stage('Git clone') {
         dir('git-repo') {
-          checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: "https://github.com/pdincau/${env.PROJECT_NAME}.git"]]])
+          checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: "https://github.com/${organization}/${projectName}.git"]]])
           env.BRANCH_NAME = branchName()
        }
      }
@@ -20,7 +20,7 @@ node {
         scm 'load -r $RTC_URL -f -d $LOCAL_WORKSPACE --all $REMOTE_WORKSPACE'
      }
      stage('Sync Git to RTC') {
-        sync '$GIT_CLONE_DIRECTORY', '$LOCAL_WORKSPACE/SRC/$PROJECT_NAME'
+        sync '$GIT_CLONE_DIRECTORY', "\$LOCAL_WORKSPACE/SRC/$projectName"
         scm 'checkin --comment "synch commit" $LOCAL_WORKSPACE'
         scm 'deliver -d $LOCAL_WORKSPACE --source $REMOTE_WORKSPACE -r $RTC_URL'
     }
