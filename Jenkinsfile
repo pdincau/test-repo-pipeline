@@ -19,7 +19,7 @@ node {
         scm 'load -r $RTC_URL -f -d $LOCAL_WORKSPACE --all $REMOTE_WORKSPACE'
      }
      stage('Sync Git to RTC') {
-        sync 'git-repo' '$LOCAL_WORKSPACE/SRC/$PROJECT_NAME'
+        sync 'git-repo', '$LOCAL_WORKSPACE/SRC/$PROJECT_NAME'
         scm 'checkin --comment "synch commit" $LOCAL_WORKSPACE'
         scm 'deliver -d $LOCAL_WORKSPACE --source $REMOTE_WORKSPACE -r $RTC_URL'
     }
