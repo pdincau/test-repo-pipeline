@@ -6,35 +6,39 @@ node {
   env.REMOTE_WORKSPACE="sync-workspace$BUILD_NUMBER"
   env.LOCAL_WORKSPACE="local-sync-workspace"
 
-  stage('Preparation') {
-      dir('git-repo') {
-        checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: "https://github.com/pdincau/${env.PROJECT_NAME}.git"]]])
-        env.BRANCH_NAME = branchName()
+  try {
+    stage('Git clone') {
+        dir('git-repo') {
+          checkout([$class: 'GitSCM', branches: [[name: '*/*']], userRemoteConfigs: [[url: "https://github.com/pdincau/${env.PROJECT_NAME}.git"]]])
+          env.BRANCH_NAME = branchName()
+       }
      }
-   }
-   stage('sync'){
-      scm 'login -u $RTC_USERNAME -P $RTC_PASSWORD -r $RTC_URL'
-      scm 'create workspace -r $RTC_URL -s $BRANCH_NAME $REMOTE_WORKSPACE'
-      try {
-          scm 'load -r $RTC_URL -f -d $LOCAL_WORKSPACE --all $REMOTE_WORKSPACE'
-
-          sh 'rsync -av --progress git-repo/* $LOCAL_WORKSPACE/SRC/$PROJECT_NAME --exclude .git --delete'
-
-          scm 'checkin --comment "synch commit" $LOCAL_WORKSPACE'
-          scm 'deliver -d $LOCAL_WORKSPACE --source $REMOTE_WORKSPACE -r $RTC_URL'
-      }
-      catch(exception) {
-        mailSyncFailed()
-        throw exception
-      }
-      finally {
-        scm 'delete workspace -r $RTC_URL $REMOTE_WORKSPACE'
-      }
-   }
+     stage('RTC clone') {
+        scm 'login -u $RTC_USERNAME -P $RTC_PASSWORD -r $RTC_URL'
+        scm 'create workspace -r $RTC_URL -s $BRANCH_NAME $REMOTE_WORKSPACE'
+        scm 'load -r $RTC_URL -f -d $LOCAL_WORKSPACE --all $REMOTE_WORKSPACE'
+     }
+     stage('Sync Git to RTC') {
+        sync 'git-repo' '$LOCAL_WORKSPACE/SRC/$PROJECT_NAME'
+        scm 'checkin --comment "synch commit" $LOCAL_WORKSPACE'
+        scm 'deliver -d $LOCAL_WORKSPACE --source $REMOTE_WORKSPACE -r $RTC_URL'
+    }
+  }
+  catch(exception) {
+    mailSyncFailed()
+    throw exception
+  }
+  finally {
+    scm 'delete workspace -r $RTC_URL $REMOTE_WORKSPACE'
+  }
 }
 
 def scm(command) {
   sh "/opt/scmtools/eclipse/scm $command"
+}
+
+def sync(gitFolder, rtcFolder) {
+  sh "rsync -av --progress $gitFolder/* $rtcFolder --exclude .git --delete"
 }
 
 def mailSyncFailed() {
