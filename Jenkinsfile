@@ -24,7 +24,7 @@ node {
      }
      stage('Sync Git to RTC') {
         sync gitCloneDirectory, "$localWorkspace/SRC/$projectName"
-        scm "checkin --comment "synch commit" $localWorkspace"
+        scm "checkin --comment 'synch commit' $localWorkspace"
         scm "deliver -d $localWorkspace --source $remoteWorkspace -r $rtcUrl"
     }
   }
