@@ -1,4 +1,3 @@
-def scmtools = '/opt/scmtools/eclipse'
 node {
   env.PROJECT_NAME=env.JOB_NAME
   env.RTC_URL="https://10.0.0.112:9443/ccm"
@@ -35,7 +34,7 @@ node {
 }
 
 def scm(command) {
-  sh "$scmtools/scm $command"
+  sh "/opt/scmtools/eclipse/scm $command"
 }
 
 def mailSyncFailed() {
